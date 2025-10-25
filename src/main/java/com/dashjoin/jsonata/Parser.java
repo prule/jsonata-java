@@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1255,7 +1256,7 @@ public class Parser {
                     // if unary minus on a number, then pre-process
                     if (exprValue.equals("-") && result.expression.type.equals("number")) {
                         result = result.expression;
-                        result.value = Utils.convertNumber( -((Number)result.value).doubleValue() );
+                        result.value = ((BigDecimal)result.value).negate();
                         if (dbg) System.out.println("unary - value="+result.value);
                     } else {
                         pushAncestry(result, result.expression);

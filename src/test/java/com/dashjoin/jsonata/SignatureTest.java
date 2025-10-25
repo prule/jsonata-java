@@ -1,6 +1,8 @@
 package com.dashjoin.jsonata;
 
 import static com.dashjoin.jsonata.Jsonata.jsonata;
+
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,13 +49,13 @@ public class SignatureTest {
       @SuppressWarnings("rawtypes")
       @Override
       public Object call(Object input, List args) throws Throwable {
-        int sum = 0;
+        BigDecimal sum = BigDecimal.ZERO;
         for (Object i : args)
-          sum += (int) i;
+          sum = sum.add((BigDecimal) i);
         return sum;
       }
     }, "<n+:n>"));
-    Assertions.assertEquals(6, expression.evaluate(null));
+    Assertions.assertEquals(BigDecimal.valueOf(6), expression.evaluate(null));
   }
 
   @Test

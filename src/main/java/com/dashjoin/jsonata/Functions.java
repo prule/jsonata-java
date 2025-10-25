@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -1321,14 +1322,15 @@ public class Functions {
             result = (Number)arg;
         else if (arg instanceof String) {
             String s = (String)arg;
+            // todo is it okay to build big decimal like this with radix
             if (s.startsWith("0x"))
-                result = Long.parseLong(s.substring(2), 16);
+                result = BigDecimal.valueOf(Long.parseLong(s.substring(2), 16));
             else if (s.startsWith("0B"))
-                result = Long.parseLong(s.substring(2), 2);
+                result = BigDecimal.valueOf(Long.parseLong(s.substring(2), 2));
             else if (s.startsWith("0O"))
-                result = Long.parseLong(s.substring(2), 8);
+                result = BigDecimal.valueOf(Long.parseLong(s.substring(2), 8));
             else
-                result = Double.valueOf((String)arg);
+                result = new BigDecimal((String)arg);
         } else if (arg instanceof Boolean) {
             result = ((boolean)arg) ? 1:0;
         }
@@ -2133,6 +2135,13 @@ public class Functions {
             // Detect the case where the value is null:
             if (result==null && ((java.util.Map)input).containsKey(key))
                 result = Jsonata.NULL_VALUE;
+        }
+
+        // automatically convert numbers in the context to BigDecimals
+        if (result instanceof Number) {
+            if (!(result instanceof BigDecimal)) {
+                result = BigDecimal.valueOf(((Number) result).doubleValue());
+            }
         }
         return result;
     }

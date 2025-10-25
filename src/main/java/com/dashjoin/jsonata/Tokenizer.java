@@ -1,14 +1,14 @@
 /**
  * jsonata-java is the JSONata Java reference port
- * 
+ * <p>
  * Copyright Dashjoin GmbH. https://dashjoin.com
- * 
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,66 +24,67 @@
  */
 package com.dashjoin.jsonata;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Tokenizer { // = function (path) {
 
-static HashMap<String, Integer> operators = new HashMap<String, Integer>() {{
-    put(".", 75);
-    put("[", 80);
-    put("]", 0);
-    put("{", 70);
-    put("}", 0);
-    put("(", 80);
-    put(")", 0);
-    put(",", 0);
-    put("@", 80);
-    put("#", 80);
-    put(";", 80);
-    put(":", 80);
-    put("?", 20);
-    put("+", 50);
-    put("-", 50);
-    put("*", 60);
-    put("/", 60);
-    put("%", 60);
-    put("|", 20);
-    put("=", 40);
-    put("<", 40);
-    put(">", 40);
-    put("^", 40);
-    put("**", 60);
-    put("..", 20);
-    put(":=", 10);
-    put("!=", 40);
-    put("<=", 40);
-    put(">=", 40);
-    put("~>", 40);
-    put("?:", 40);
-    put("??", 40);
-    put("and", 30);
-    put("or", 25);
-    put("in", 40);
-    put("&", 50);
-    put("!", 0);
-    put("~", 0);
-}};
+    static HashMap<String, Integer> operators = new HashMap<String, Integer>() {{
+        put(".", 75);
+        put("[", 80);
+        put("]", 0);
+        put("{", 70);
+        put("}", 0);
+        put("(", 80);
+        put(")", 0);
+        put(",", 0);
+        put("@", 80);
+        put("#", 80);
+        put(";", 80);
+        put(":", 80);
+        put("?", 20);
+        put("+", 50);
+        put("-", 50);
+        put("*", 60);
+        put("/", 60);
+        put("%", 60);
+        put("|", 20);
+        put("=", 40);
+        put("<", 40);
+        put(">", 40);
+        put("^", 40);
+        put("**", 60);
+        put("..", 20);
+        put(":=", 10);
+        put("!=", 40);
+        put("<=", 40);
+        put(">=", 40);
+        put("~>", 40);
+        put("?:", 40);
+        put("??", 40);
+        put("and", 30);
+        put("or", 25);
+        put("in", 40);
+        put("&", 50);
+        put("!", 0);
+        put("~", 0);
+    }};
 
-static HashMap<String, String> escapes = new HashMap<String, String>() {{
-    // JSON string escape sequences - see json.org
-    put("\"", "\"");
-    put("\\", "\\");
-    put("/", "/");
-    put("b", "\b");
-    put("f", "\f");
-    put("n", "\n");
-    put("r", "\r");
-    put("t", "\t");
-}};
+    static HashMap<String, String> escapes = new HashMap<String, String>() {{
+        // JSON string escape sequences - see json.org
+        put("\"", "\"");
+        put("\\", "\\");
+        put("/", "/");
+        put("b", "\b");
+        put("f", "\f");
+        put("n", "\n");
+        put("r", "\r");
+        put("t", "\t");
+    }};
 
-// Tokenizer (lexer) - invoked by the parser to return one token at a time
+    // Tokenizer (lexer) - invoked by the parser to return one token at a time
     String path;
     int position = 0;
     int length; // = path.length;
@@ -103,7 +104,9 @@ static HashMap<String, String> escapes = new HashMap<String, String>() {{
 
     Token create(String type, Object value) {
         Token t = new Token();
-        t.type = type; t.value = value; t.position = position;
+        t.type = type;
+        t.value = value;
+        t.position = position;
         return t;
     }
 
@@ -151,13 +154,13 @@ static HashMap<String, String> escapes = new HashMap<String, String>() {{
                     }
                 }
                 flags = path.substring(start, position) + 'g';
-                
+
                 // Convert flags to Java Pattern flags
                 int _flags = 0;
                 if (flags.contains("i"))
                     _flags |= Pattern.CASE_INSENSITIVE;
                 if (flags.contains("m"))
-                    _flags |= Pattern.MULTILINE;                
+                    _flags |= Pattern.MULTILINE;
                 return Pattern.compile(pattern, _flags); // Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
             }
             if ((currentChar == '(' || currentChar == '[' || currentChar == '{') && path.charAt(position - 1) != '\\') {
@@ -169,7 +172,9 @@ static HashMap<String, String> escapes = new HashMap<String, String>() {{
             position++;
         }
         throw new JException("S0302", position);
-    };
+    }
+
+    ;
 
     Token next(boolean prefix) {
         if (position >= length) return null;
@@ -202,7 +207,7 @@ static HashMap<String, String> escapes = new HashMap<String, String>() {{
             return create("regex", scanRegex());
         }
         // handle double-char operators
-        boolean haveMore = position < path.length()-1; // Java: position+1 is valid
+        boolean haveMore = position < path.length() - 1; // Java: position+1 is valid
         if (currentChar == '.' && haveMore && path.charAt(position + 1) == '.') {
             // double-dot .. range operator
             position += 2;
@@ -249,7 +254,7 @@ static HashMap<String, String> escapes = new HashMap<String, String>() {{
             return create("operator", "??");
         }
         // test for single char operators
-        if (operators.get(""+currentChar)!=null) {
+        if (operators.get("" + currentChar) != null) {
             position++;
             return create("operator", currentChar);
         }
@@ -263,12 +268,13 @@ static HashMap<String, String> escapes = new HashMap<String, String>() {{
                 currentChar = path.charAt(position);
                 if (currentChar == '\\') { // escape sequence
                     position++;
-                    if (position < path.length()) currentChar = path.charAt(position); else throw new JException("S0103", position, "");
-                    if (escapes.get(""+currentChar)!=null) {
-                        qstr += escapes.get(""+currentChar);
+                    if (position < path.length()) currentChar = path.charAt(position);
+                    else throw new JException("S0103", position, "");
+                    if (escapes.get("" + currentChar) != null) {
+                        qstr += escapes.get("" + currentChar);
                     } else if (currentChar == 'u') {
                         //  u should be followed by 4 hex digits
-                        String octets = position+5 < path.length() ? path.substring(position + 1, (position + 1) + 4) : "";
+                        String octets = position + 5 < path.length() ? path.substring(position + 1, (position + 1) + 4) : "";
                         if (octets.matches("^[0-9a-fA-F]+$")) { //  /^[0-9a-fA-F]+$/.test(octets)) {
                             int codepoint = Integer.parseInt(octets, 16);
                             qstr += Character.toString((char) codepoint);
@@ -295,12 +301,12 @@ static HashMap<String, String> escapes = new HashMap<String, String>() {{
         Pattern numregex = Pattern.compile("^-?(0|([1-9][0-9]*))(\\.[0-9]+)?([Ee][-+]?[0-9]+)?");
         Matcher match = numregex.matcher(path.substring(position));
         if (match.find()) {
-            double num = Double.parseDouble(match.group(0));
-            if (!Double.isNaN(num) && Double.isFinite(num)) {
+            try {
+                BigDecimal num = new BigDecimal(match.group(0));
                 position += match.group(0).length();
                 // If the number is integral, use long as type
-                return create("number", Utils.convertNumber(num));
-            } else {
+                return create("number", num);
+            } catch (NumberFormatException e) {
                 throw new JException("S0102", position); //, match.group[0]);
             }
         }
@@ -325,8 +331,8 @@ static HashMap<String, String> escapes = new HashMap<String, String>() {{
         while (true) {
             //if (i>=length) return null; // Uli: JS relies on charAt returns null
 
-            ch = i<length ? path.charAt(i) : 0;
-            if (i == length || " \t\n\r".indexOf(ch) > -1 || operators.containsKey(""+ch)) { // Uli: removed \v
+            ch = i < length ? path.charAt(i) : 0;
+            if (i == length || " \t\n\r".indexOf(ch) > -1 || operators.containsKey("" + ch)) { // Uli: removed \v
                 if (path.charAt(position) == '$') {
                     // variable reference
                     String _name = path.substring(position + 1, i);

@@ -17,6 +17,7 @@
  */
 package com.dashjoin.jsonata;
 
+import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -151,6 +152,9 @@ public class Utils {
     }
      
     public static Number convertNumber(Number n) {
+        if (n instanceof BigDecimal) {
+            return n;
+        }
         // Use long if the number is not fractional
         if (!isNumeric(n)) return null;
         if (n.longValue()==n.doubleValue()) {

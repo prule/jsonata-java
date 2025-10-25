@@ -4,6 +4,8 @@ import static com.dashjoin.jsonata.Jsonata.jsonata;
 import static java.util.Arrays.asList;
 import static java.util.Map.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +41,15 @@ public class ArrayTest {
   @Test
   public void testSort() {
     Jsonata expr = jsonata("$sort([{'x': 2}, {'x': 1}], function($l, $r){$l.x > $r.x})");
-    Assertions.assertEquals(Arrays.asList(Map.of("x", 1), Map.of("x", 2)), expr.evaluate(null));
+    Assertions.assertEquals(
+            Arrays.asList(Map.of("x", BigDecimal.valueOf(1)), Map.of("x", BigDecimal.valueOf(2))),
+            expr.evaluate(null));
   }
 
   @Test
   public void testSortNull() {
     Jsonata expr = jsonata("$sort([{'x': 2}, {'x': 1}], function($l, $r){$l.y > $r.y})");
-    Assertions.assertEquals(Arrays.asList(Map.of("x", 2), Map.of("x", 1)), expr.evaluate(null));
+    Assertions.assertEquals(Arrays.asList(Map.of("x", BigDecimal.valueOf(2)), Map.of("x", BigDecimal.valueOf(1))), expr.evaluate(null));
   }
 
   @Test

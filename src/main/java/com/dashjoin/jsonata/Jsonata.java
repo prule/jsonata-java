@@ -26,6 +26,7 @@ package com.dashjoin.jsonata;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -804,14 +805,31 @@ public class Jsonata {
      * @returns {*} Result
      */
     Object evaluateNumericExpression(Object _lhs, Object _rhs, String op) {
-        double result = 0;
+        BigDecimal result = BigDecimal.ZERO;
 
-        if (_lhs!=null && !Utils.isNumeric(_lhs)) {
+        if(_lhs != null) {
+            if (_lhs instanceof Number) {
+                if (!(_lhs instanceof BigDecimal)) {
+                    _lhs = new BigDecimal(((Number) _lhs).doubleValue());
+                }
+            }
+        }
+
+        if(_rhs != null) {
+            if (_rhs instanceof Number) {
+                if (!(_rhs instanceof BigDecimal)) {
+                    _rhs = new BigDecimal(((Number) _rhs).doubleValue());
+                }
+            }
+        }
+
+        if (_lhs!=null && !(_lhs instanceof BigDecimal)) {
             throw new JException("T2001", -1,
             op, _lhs
             );
         }
-        if (_rhs!=null && !Utils.isNumeric(_rhs)) {
+
+        if (_rhs!=null && !(_rhs instanceof BigDecimal)) {
             throw new JException("T2002", -1,
             op, _rhs
             );
@@ -823,27 +841,33 @@ public class Jsonata {
         }
 
         //System.out.println("op22 "+op+" "+_lhs+" "+_rhs);
-        double lhs = ((Number)_lhs).doubleValue();
-        double rhs = ((Number)_rhs).doubleValue();
+        BigDecimal lhs = ((BigDecimal)_lhs);
+        BigDecimal rhs = ((BigDecimal)_rhs);
 
         switch (op) {
             case "+":
-                result = lhs + rhs;
+                result = lhs.add(rhs);
                 break;
             case "-":
-                result = lhs - rhs;
+                result = lhs.subtract(rhs);
                 break;
             case "*":
-                result = lhs * rhs;
+                result = lhs.multiply(rhs);
                 break;
             case "/":
-                result = lhs / rhs;
+                try {
+                    result = lhs.divide(rhs);
+                } catch (ArithmeticException e) {
+                    if (e.getMessage().contains("Division by zero")) {
+                        throw new JException("D1001", 0, "Infinity");
+                    }
+                }
                 break;
             case "%":
-                result = lhs % rhs;
+                result = lhs.remainder(rhs);
                 break;
         }
-        return Utils.convertNumber(result);
+        return result;
     }
  
      /**
@@ -868,10 +892,10 @@ public class Jsonata {
         // JSON might come with integers,
         // convert all to double...
         // FIXME: semantically OK?
-        if (lhs instanceof Number)
-            lhs = ((Number)lhs).doubleValue();
-        if (rhs instanceof Number)
-            rhs = ((Number)rhs).doubleValue();
+//        if (lhs instanceof Number)
+//            lhs = ((Number)lhs).doubleValue();
+//        if (rhs instanceof Number)
+//            rhs = ((Number)rhs).doubleValue();
 
         switch (op) {
             case "=":

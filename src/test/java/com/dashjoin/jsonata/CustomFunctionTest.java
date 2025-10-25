@@ -1,5 +1,6 @@
 package com.dashjoin.jsonata;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -35,14 +36,14 @@ public class CustomFunctionTest {
   public void testUnary() {
     var expression = Jsonata.jsonata("$echo(123)");
     expression.registerFunction("echo", (x) -> x);
-    Assertions.assertEquals(123, expression.evaluate(null));
+    Assertions.assertEquals(BigDecimal.valueOf(123), expression.evaluate(null));
   }
 
   @Test
   public void testBinary() {
     var expression = Jsonata.jsonata("$add(21, 21)");
-    expression.registerFunction("add", (Integer a, Integer b) -> a + b);
-    Assertions.assertEquals(42, expression.evaluate(null));
+    expression.registerFunction("add", (BigDecimal a, BigDecimal b) -> a.add(b));
+    Assertions.assertEquals(BigDecimal.valueOf(42), expression.evaluate(null));
   }
 
   @Test
@@ -64,7 +65,7 @@ public class CustomFunctionTest {
   @Test
   public void testLambdaSignatureError() {
     var expression = Jsonata.jsonata("$append(1, 2)");
-    expression.registerFunction("append", (Integer a, Boolean b) -> "" + a + b);
+    expression.registerFunction("append", (BigDecimal a, Boolean b) -> "" + a + b);
     Assertions.assertThrowsExactly(ClassCastException.class, () -> expression.evaluate(null));
   }
 
