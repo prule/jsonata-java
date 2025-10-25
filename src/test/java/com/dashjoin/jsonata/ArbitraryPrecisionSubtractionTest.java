@@ -1,28 +1,40 @@
 package com.dashjoin.jsonata;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import static java.util.Map.of;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.dashjoin.jsonata.Jsonata.jsonata;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ArbitraryPrecisionSubtractionTest {
 
-    @Test
-    public void testLiterals() {
-        Jsonata expr1 = jsonata("0.8 - 0.1");
-        var res1 = expr1.evaluate(new HashMap<>());
-        assertEquals(new BigDecimal("0.7"), res1);
+    static Stream<Arguments> cases() {
+        return Stream.of(
+                // subtraction
+                Arguments.of("0.8 - 0.1", new BigDecimal("0.7"), Map.of()),
+                Arguments.of("a - b", new BigDecimal("0.7"), Map.of("a", 0.8, "b", 0.1)),
+                // addition
+                Arguments.of("0.8 + 0.1", new BigDecimal("0.9"), Map.of()),
+                Arguments.of("a + b", new BigDecimal("0.9"), Map.of("a", 0.8, "b", 0.1)),
+                // multiplication
+                Arguments.of("0.8 * 0.1", new BigDecimal("0.08"), Map.of()),
+                Arguments.of("a * b", new BigDecimal("0.08"), Map.of("a", 0.8, "b", 0.1)),
+                // division
+                Arguments.of("0.8 / 0.1", new BigDecimal("8"), Map.of()),
+                Arguments.of("a / b", new BigDecimal("8"), Map.of("a", 0.8, "b", 0.1))
+        );
     }
 
-    @Test
-    public void testLiteralsViaContext() {
-        Jsonata expr1 = jsonata("a - b");
-        var res1 = expr1.evaluate(of("a", 0.8, "b", 0.1));
-        assertEquals(new BigDecimal("0.7"), res1);
+    @ParameterizedTest
+    @MethodSource("cases")
+    void test(String expression, BigDecimal expected, Map<String, Object> input) {
+        Jsonata expr = jsonata(expression);
+        var res = expr.evaluate(input);
+        assertEquals(expected, res);
     }
-
 }
