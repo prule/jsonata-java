@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import static com.dashjoin.jsonata.Jsonata.jsonata;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ArbitraryPrecisionSubtractionTest {
+public class ArbitraryPrecisionTest {
 
     static Stream<Arguments> cases() {
         return Stream.of(

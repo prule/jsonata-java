@@ -1189,6 +1189,32 @@ public class Jsonata {
     Object evaluateRangeExpression(Object lhs, Object rhs) {
         Object result = null;
 
+        // convert to long, and error if there is any fractional part
+        if (lhs instanceof BigDecimal) {
+            try {
+                lhs = ((BigDecimal) lhs).longValueExact();
+            } catch (ArithmeticException e) {
+                throw new JException("T2003",
+                        //stack: (new Error()).stack,
+                        -1,
+                        lhs
+                );
+            }
+        }
+
+        // convert to long, and error if there is any fractional part
+        if (rhs instanceof BigDecimal) {
+            try {
+                rhs = ((BigDecimal) rhs).longValueExact();
+            } catch (ArithmeticException e) {
+                throw new JException("T2003",
+                        //stack: (new Error()).stack,
+                        -1,
+                        rhs
+                );
+            }
+        }
+
         if (lhs != null && (!(lhs instanceof Long) && !(lhs instanceof Integer))) {
             throw new JException("T2003",
                 //stack: (new Error()).stack,
